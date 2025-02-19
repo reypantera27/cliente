@@ -91,14 +91,12 @@ function loadTaxiLocations() {
                 // Si el usuario NO es admin, solo debe ver su taxi
                 if (!isAdmin && taxi.id !== userId) return;
 
-                const marker = new google.maps.Marker({
-                    position: { lat: taxi.lat, lng: taxi.lng },
+                const marker = new google.maps.marker.AdvancedMarkerElement({
+                    position: new google.maps.LatLng(taxi.lat, taxi.lng),
                     map,
-                    title: `Taxi: ${taxi.id}`,
-                    icon: {
-                        url: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" // Icono amarillo para taxis
-                    }
+                    title: `Taxi: ${taxi.id}`
                 });
+                
 
                 // Agregar la etiqueta con la última actualización
                 const lastUpdatedLabel = new Date(taxi.lastUpdated);
