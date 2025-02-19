@@ -6,7 +6,7 @@ let isAdmin = false; // Variable para identificar si el usuario es administrador
 
 // Función para pedir el nombre del chofer o acceso de administrador
 function askUserId() {
-    const input = prompt("Ingrese su nombre (o 'admin' si es administrador):");
+    const input = prompt("Ingrese su nombre:");
     
     if (!input) {
         alert("Debe ingresar un nombre.");
