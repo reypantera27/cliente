@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Seguimiento de Taxis</title>
-        <link rel="stylesheet" href="styles.css"> <!-- Vincula el archivo CSS -->
-        <script src="https://maps.googleapis.com/maps/api/js?AIzaSyD4BxT1FZ5gJttFfwKUP3EHGY94ciuPuik&callback=initMap" async defer></script>
-    </head>
-    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de Taxis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Asegúrate de que el archivo está en la misma carpeta -->
+</head>
+
 <body>
-    <h1>Ubicación del Taxi</h1>
-    <p>La ubicación será enviada al servidor cada 10 segundos.</p>
-    <div id="map"></div>
-    <p id="status"></p>
+    <div class="container">
+        <h1>Ubicación del Taxi</h1>
+        <p>La ubicación será enviada al servidor cada 10 segundos.</p>
+        <div id="map"></div>
+        <p id="status"></p>
+    </div>
+
+    <!-- Script principal de la app -->
+    <script src="scripts.js"></script>
+    <!-- API de Google Maps, debe cargarse después del script -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4BxT1FZ5gJttFfwKUP3EHGY94ciuPuik&callback=initMap" async defer></script>
 </body>
 </html>
