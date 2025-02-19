@@ -100,14 +100,22 @@ function loadTaxiLocations() {
                     }
                 });
 
-                // Mostrar la última actualización en el marcador (si es un admin)
-                if (isAdmin) {
-                    marker.setLabel({
-                        text: `Última actualización: ${new Date(taxi.lastUpdated).toLocaleString()}`,
-                        fontSize: "10px",
-                        color: "#000000"
-                    });
-                }
+                // Agregar la etiqueta con la última actualización
+                const lastUpdatedLabel = new Date(taxi.lastUpdated);
+                const formattedTime = lastUpdatedLabel.toLocaleString('es-AR', {
+                    timeZone: 'America/Argentina/Buenos_Aires',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
+                });
+
+                // Crear una etiqueta de texto con la última actualización
+                marker.setLabel({
+                    text: `Última actualización: ${formattedTime}`,
+                    fontSize: "10px",
+                    color: "#000000",
+                    className: 'marker-label'
+                });
 
                 markers[taxi.id] = marker;
             });

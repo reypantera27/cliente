@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App de Choferes</title>
-    <style>
-        #map {
-            height: 400px;
-            width: 100%;
-        }
-    </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4BxT1FZ5gJttFfwKUP3EHGY94ciuPuik"></script>
-    <script src="scripts.js"></script>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Seguimiento de Taxis</title>
+        <link rel="stylesheet" href="css/styles.css"> <!-- Vincula el archivo CSS -->
+        <script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap" async defer></script>
+    </head>
+    
 <body>
     <h1>Ubicación del Taxi</h1>
     <p>La ubicación será enviada al servidor cada 10 segundos.</p>
