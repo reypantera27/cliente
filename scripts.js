@@ -1,6 +1,7 @@
 let trackingInterval = null;
 let map;  // Se mantiene la referencia al mapa
 let userPosition = null;  // Guardar la posición del usuario para que no se vuelva a pedir
+let taxiName = '';  // Variable para almacenar el nombre o ID del taxi
 
 // Función para inicializar el mapa
 function initMap() {
@@ -20,10 +21,23 @@ function loadTaxiLocations() {
         .then(data => {
             // Agregar un marcador para cada taxi en el mapa
             data.forEach(taxi => {
+                let icon = {
+                    url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png', // Diferente color según el taxi
+                    scaledSize: new google.maps.Size(30, 30)
+                };
+
+                if (taxi.id === taxiName) {
+                    icon = {
+                        url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png', // Cambia el color para el taxi actual
+                        scaledSize: new google.maps.Size(30, 30)
+                    };
+                }
+
                 new google.maps.Marker({
                     position: { lat: taxi.lat, lng: taxi.lng },
                     map,
-                    title: `Taxi ${taxi.id}`
+                    title: `Taxi ${taxi.id}`,
+                    icon: icon
                 });
             });
         })
@@ -34,7 +48,7 @@ function loadTaxiLocations() {
 
 // Función para obtener la ubicación y enviarla al servidor
 function getLocationAndSend() {
-    if (userPosition) {
+    if (userPosition && taxiName) {
         // Usar las coordenadas obtenidas previamente
         const lat = userPosition.latitude;
         const lng = userPosition.longitude;
@@ -46,7 +60,7 @@ function getLocationAndSend() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                taxiId: 'taxi1', // Usa un ID único por taxi
+                taxiId: taxiName, // Usamos el nombre o ID ingresado por el chofer
                 lat: lat,
                 lng: lng
             })
@@ -62,11 +76,23 @@ function getLocationAndSend() {
         const taxiMarker = new google.maps.Marker({
             position: { lat, lng },
             map,
-            title: 'Mi ubicación'
+            title: 'Mi ubicación',
+            icon: {
+                url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png', // Marcador azul para el taxi actual
+                scaledSize: new google.maps.Size(30, 30)
+            }
         });
         map.setCenter({ lat, lng });
     } else {
-        console.error("La ubicación aún no ha sido obtenida.");
+        console.error("La ubicación aún no ha sido obtenida o no se ha ingresado un nombre.");
+    }
+}
+
+// Función para iniciar el seguimiento del taxi
+function startTracking() {
+    if (!trackingInterval && userPosition && taxiName) {
+        trackingInterval = setInterval(getLocationAndSend, 10000); // Usa las coordenadas obtenidas y las envía cada 10 segundos
+        document.getElementById('status').textContent = 'Seguimiento iniciado.';
     }
 }
 
@@ -88,16 +114,9 @@ function getUserLocation() {
     }
 }
 
-// Función para iniciar el seguimiento del taxi
-function startTracking() {
-    if (!trackingInterval && userPosition) {
-        trackingInterval = setInterval(getLocationAndSend, 10000); // Usa las coordenadas obtenidas y las envía cada 10 segundos
-        document.getElementById('status').textContent = 'Seguimiento iniciado.';
-    }
-}
-
-// Inicializa el mapa y comienza a hacer seguimiento automáticamente al cargar la página
+// Obtener el nombre o ID del taxi y comenzar el seguimiento
 document.addEventListener('DOMContentLoaded', function() {
+    taxiName = document.getElementById('taxiName').value || prompt('Ingrese el nombre o ID del taxi:');
     initMap();  // Inicializa el mapa
     getUserLocation();  // Obtén la ubicación del usuario una sola vez
 });
