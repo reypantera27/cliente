@@ -70,23 +70,6 @@ function getLocationAndSend() {
     }
 }
 
-// Función para iniciar el seguimiento del taxi
-function startTracking() {
-    if (!trackingInterval && userPosition) {
-        trackingInterval = setInterval(getLocationAndSend, 10000); // Usa las coordenadas obtenidas y las envía cada 10 segundos
-        document.getElementById('status').textContent = 'Seguimiento iniciado.';
-    }
-}
-
-// Función para detener el seguimiento del taxi
-function stopTracking() {
-    if (trackingInterval) {
-        clearInterval(trackingInterval);
-        trackingInterval = null;
-        document.getElementById('status').textContent = 'Seguimiento detenido.';
-    }
-}
-
 // Función para obtener la ubicación del usuario
 function getUserLocation() {
     if (navigator.geolocation) {
@@ -102,6 +85,14 @@ function getUserLocation() {
         });
     } else {
         console.error('La geolocalización no es compatible con este navegador.');
+    }
+}
+
+// Función para iniciar el seguimiento del taxi
+function startTracking() {
+    if (!trackingInterval && userPosition) {
+        trackingInterval = setInterval(getLocationAndSend, 10000); // Usa las coordenadas obtenidas y las envía cada 10 segundos
+        document.getElementById('status').textContent = 'Seguimiento iniciado.';
     }
 }
 
