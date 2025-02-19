@@ -94,7 +94,7 @@ function loadTaxiLocations() {
                 const marker = new google.maps.Marker({
                     position: { lat: taxi.lat, lng: taxi.lng },
                     map,
-                    title: `auto: ${taxi.id}`,
+                    title: `Taxi: ${taxi.id}`,
                     icon: {
                         url: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" // Icono amarillo para taxis
                     }
