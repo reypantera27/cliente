@@ -6,7 +6,7 @@ let isAdmin = false; // Variable para identificar si el usuario es administrador
 
 // Función para pedir el nombre del chofer o acceso de administrador
 function askUserId() {
-    const input = prompt("Ingrese su nombre:");
+    const input = prompt("Ingrese su nombre (o 'admin' si es administrador):");
     
     if (!input) {
         alert("Debe ingresar un nombre.");
@@ -56,8 +56,8 @@ function sendLocation() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             taxiId: userId, // Usa el nombre ingresado como ID
-            lat: userPosition.latitude, // Usa la latitud correcta
-            lng: userPosition.longitude // Usa la longitud correcta
+            lat: userPosition.latitude,
+            lng: userPosition.longitude
         })
     }).then(response => {
         if (response.ok) {
@@ -94,11 +94,20 @@ function loadTaxiLocations() {
                 const marker = new google.maps.Marker({
                     position: { lat: taxi.lat, lng: taxi.lng },
                     map,
-                    title: `Taxi: ${taxi.id}`,
+                    title: `auto: ${taxi.id}`,
                     icon: {
                         url: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" // Icono amarillo para taxis
                     }
                 });
+
+                // Mostrar la última actualización en el marcador (si es un admin)
+                if (isAdmin) {
+                    marker.setLabel({
+                        text: `Última actualización: ${new Date(taxi.lastUpdated).toLocaleString()}`,
+                        fontSize: "10px",
+                        color: "#000000"
+                    });
+                }
 
                 markers[taxi.id] = marker;
             });
