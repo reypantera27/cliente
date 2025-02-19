@@ -56,8 +56,8 @@ function sendLocation() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             taxiId: userId, // Usa el nombre ingresado como ID
-            lat: userPosition.latitude,
-            lng: userPosition.longitude
+            lat: userPosition.latitude, // Usa la latitud correcta
+            lng: userPosition.longitude // Usa la longitud correcta
         })
     }).then(response => {
         if (response.ok) {
