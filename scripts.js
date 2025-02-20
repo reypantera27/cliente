@@ -41,9 +41,11 @@ function getUserLocation(callback) {
             callback(userPosition);
         }, error => {
             console.error("Error al obtener la ubicación:", error);
+            document.getElementById("status").textContent = "No se pudo obtener la ubicación. Asegúrese de habilitar la geolocalización.";
         });
     } else {
         console.error("La geolocalización no es compatible con este navegador.");
+        document.getElementById("status").textContent = "El navegador no soporta geolocalización.";
     }
 }
 
@@ -91,12 +93,11 @@ function loadTaxiLocations() {
                 // Si el usuario NO es admin, solo debe ver su taxi
                 if (!isAdmin && taxi.id !== userId) return;
 
-                const marker = new google.maps.marker.AdvancedMarkerElement({
+                const marker = new google.maps.Marker({
                     position: new google.maps.LatLng(taxi.lat, taxi.lng),
                     map,
                     title: `Taxi: ${taxi.id}`
                 });
-                
 
                 // Agregar la etiqueta con la última actualización
                 const lastUpdatedLabel = new Date(taxi.lastUpdated);
