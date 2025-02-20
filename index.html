@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seguimiento de Taxis</title>
     <link rel="stylesheet" href="styles.css"> <!-- Asegúrate de que el archivo está en la misma carpeta -->
+    <link rel="manifest" href="/manifest.json">
+
 </head>
 
 <body>
@@ -21,6 +23,13 @@
     <script async
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4BxT1FZ5gJttFfwKUP3EHGY94ciuPuik&callback=initMap&libraries=marker">
 </script>
-</script>
+<script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js")
+        .then(() => console.log("Service Worker registrado."))
+        .catch((error) => console.log("Error registrando Service Worker:", error));
+    }
+  </script>
+  
 </body>
 </html>
