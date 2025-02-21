@@ -1,39 +1,39 @@
 let map;
 let userPosition = null;
 let userId = null;
-let markers = {}; // Almacenar los marcadores de los taxis
-let isAdmin = false; // Variable para identificar si el usuario es administrador
+let markers = {}; 
+let isAdmin = false; 
 
-// Función para pedir el nombre del chofer o acceso de administrador
+// Pedir el nombre del usuario o si es administrador
 function askUserId() {
     const input = prompt("Ingrese su nombre (o 'admin' si es administrador):");
     
     if (!input) {
         alert("Debe ingresar un nombre.");
-        return askUserId(); // Vuelve a pedir el nombre si no se ingresó nada
+        return askUserId();
     }
 
     userId = input.trim().toLowerCase();
-    isAdmin = (userId === "admin"); // Si el usuario escribe "admin", es administrador
+    isAdmin = (userId === "admin");
 
     if (!isAdmin) {
-        startTracking(); // Si no es admin, comienza a enviar su ubicación
+        startTracking();
     }
 
-    initMap(); // Inicia el mapa después de obtener el nombre
+    initMap();
 }
 
-// Función para inicializar el mapa
+// Inicializar el mapa
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: -31.6300, lng: -60.7000 }, // Santa Fe, Argentina
+        center: { lat: -31.6300, lng: -60.7000 },
         zoom: 12
     });
 
-    loadTaxiLocations(); // Cargar taxis en el mapa
+    loadTaxiLocations();
 }
 
-// Función para obtener la ubicación del usuario
+// Obtener ubicación del usuario
 function getUserLocation(callback) {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
@@ -41,15 +41,15 @@ function getUserLocation(callback) {
             callback(userPosition);
         }, error => {
             console.error("Error al obtener la ubicación:", error);
-            document.getElementById("status").textContent = "No se pudo obtener la ubicación. Asegúrese de habilitar la geolocalización.";
+            document.getElementById("status").textContent = "No se pudo obtener la ubicación.";
         });
     } else {
-        console.error("La geolocalización no es compatible con este navegador.");
+        console.error("Geolocalización no soportada.");
         document.getElementById("status").textContent = "El navegador no soporta geolocalización.";
     }
 }
 
-// Función para enviar la ubicación al servidor
+// Enviar ubicación al servidor
 function sendLocation() {
     if (!userPosition || !userId) return;
 
@@ -57,40 +57,38 @@ function sendLocation() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            taxiId: userId, // Usa el nombre ingresado como ID
+            taxiId: userId,
             lat: userPosition.latitude,
             lng: userPosition.longitude
         })
     }).then(response => {
         if (response.ok) {
-            console.log("Ubicación enviada correctamente.");
+            console.log("Ubicación enviada.");
         } else {
-            console.error("Error al enviar la ubicación.");
+            console.error("Error al enviar ubicación.");
         }
     });
 }
 
-// Función para actualizar la ubicación del usuario cada 10 segundos
+// Actualizar ubicación cada 10 segundos
 function startTracking() {
     getUserLocation(position => {
-        sendLocation(); // Enviar ubicación al inicio
+        sendLocation();
         setInterval(() => {
             getUserLocation(sendLocation);
-        }, 10000); // Enviar cada 10 segundos
+        }, 10000);
     });
 }
 
-// Función para obtener y mostrar las ubicaciones de los taxis
+// Cargar ubicaciones de los taxis
 function loadTaxiLocations() {
     fetch('https://flota-cfj7.onrender.com/get-taxi-locations')
         .then(response => response.json())
         .then(data => {
-            // Eliminar todos los marcadores previos
             Object.values(markers).forEach(marker => marker.setMap(null));
             markers = {};
 
             data.forEach(taxi => {
-                // Si el usuario NO es admin, solo debe ver su taxi
                 if (!isAdmin && taxi.id !== userId) return;
 
                 const marker = new google.maps.Marker({
@@ -99,7 +97,6 @@ function loadTaxiLocations() {
                     title: `Taxi: ${taxi.id}`
                 });
 
-                // Agregar la etiqueta con la última actualización
                 const lastUpdatedLabel = new Date(taxi.lastUpdated);
                 const formattedTime = lastUpdatedLabel.toLocaleString('es-AR', {
                     timeZone: 'America/Argentina/Buenos_Aires',
@@ -108,7 +105,6 @@ function loadTaxiLocations() {
                     second: 'numeric',
                 });
 
-                // Crear una etiqueta de texto con la última actualización
                 marker.setLabel({
                     text: `Última actualización: ${formattedTime}`,
                     fontSize: "10px",
@@ -120,12 +116,11 @@ function loadTaxiLocations() {
             });
         })
         .catch(error => {
-            console.error("Error al cargar ubicaciones de taxis:", error);
+            console.error("Error al cargar ubicaciones:", error);
         });
 
-    // Recargar ubicaciones cada 10 segundos
     setTimeout(loadTaxiLocations, 10000);
 }
 
-// Inicia el sistema cuando se carga la página
+// Iniciar el sistema al cargar la página
 document.addEventListener("DOMContentLoaded", askUserId);

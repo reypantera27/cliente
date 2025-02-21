@@ -3,32 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seguimiento de Taxis</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Asegúrate de que el archivo está en la misma carpeta -->
-    <link rel="manifest" href="/manifest.json">
+    <title>Control de Flota</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
+    <div class="header">
+        <h1>Control de Flota de Taxis</h1>
+    </div>
     <div class="container">
-        <h1>ubicacion movil</h1>
-        <p>La ubicación será enviada al servidor cada 10 segundos.</p>
         <div id="map"></div>
         <p id="status"></p>
     </div>
-
-    <!-- Script principal de la app -->
-    <script src="scripts.js"></script>
-    <!-- API de Google Maps, debe cargarse después del script -->
-    <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4BxT1FZ5gJttFfwKUP3EHGY94ciuPuik&callback=initMap&libraries=marker">
-    </script>
-    
-    <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("/sw.js")
-                .then(() => console.log("Service Worker registrado."))
-                .catch((error) => console.log("Error registrando Service Worker:", error));
-        }
-    </script>
+    <script src="script.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap"></script>
 </body>
 </html>
