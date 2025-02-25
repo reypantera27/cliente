@@ -28,7 +28,7 @@ h1 {
 
 /* Alineación de los logos a la izquierda y derecha */
 .logo {
-    width: 30px;  /* Ajusta el tamaño del logo */
+    width: 80px;  /* Ajusta el tamaño del logo */
     height: auto;
     margin: 0 10px; /* Espaciado entre el texto y los logos */
 }
