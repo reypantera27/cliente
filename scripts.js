@@ -85,11 +85,23 @@ function loadTaxiLocations() {
     fetch('https://flota-cfj7.onrender.com/get-taxi-locations')
         .then(response => response.json())
         .then(data => {
+            // Eliminar marcadores antiguos
             Object.values(markers).forEach(marker => marker.setMap(null));
             markers = {};
 
+            const ahora = Date.now();
+
             data.forEach(taxi => {
                 if (!isAdmin && taxi.id !== userId) return;
+
+                // Calcular tiempo transcurrido desde la última actualización
+                const tiempoTranscurrido = (ahora - new Date(taxi.lastUpdated).getTime()) / 1000 / 60; // en minutos
+
+                // Si han pasado más de 10 minutos, no dibujar el marcador
+                if (tiempoTranscurrido > 10) {
+                    console.log(`Taxi ${taxi.id} eliminado por inactividad.`);
+                    return;
+                }
 
                 const marker = new google.maps.Marker({
                     position: new google.maps.LatLng(taxi.lat, taxi.lng),
