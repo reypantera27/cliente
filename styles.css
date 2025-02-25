@@ -17,6 +17,22 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Estilos para el h1 con los logos */
+h1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Alineación de los logos a la izquierda y derecha */
+.logo {
+    width: 30px;  /* Ajusta el tamaño del logo */
+    height: auto;
+    margin: 0 10px; /* Espaciado entre el texto y los logos */
+}
+
 /* Contenedor principal */
 .container {
     position: relative;
