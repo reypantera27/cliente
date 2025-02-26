@@ -91,10 +91,14 @@ function loadTaxiLocations() {
 
                 markers[taxi.id] = marker;
             });
+
+            // Llamar a la función que muestra el menú de choferes
+            showDriverMenu();
         });
 
     setTimeout(loadTaxiLocations, 10000);
 }
+
 
 // Mostrar menú de choferes y sus recorridos
 function showDriverMenu() {

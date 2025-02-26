@@ -86,4 +86,19 @@ h1 {
     #map {
         height: 75vh;
     }
+    #driverMenu button {
+        background-color: #3498db;
+        color: white;
+        font-size: 16px;
+        padding: 10px 20px;
+        border: none;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    #driverMenu button:hover {
+        background-color: #2980b9;
+    }
+    
 }
