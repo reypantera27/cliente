@@ -121,6 +121,17 @@ function loadTaxiLocations() {
     setTimeout(loadTaxiLocations, 10000);
 }
 
+// Función para formatear el timestamp a una hora legible
+function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
 function showDriverMenu() {
     fetch("https://flota-cfj7.onrender.com/get-location")
         .then((response) => response.json())
@@ -128,11 +139,21 @@ function showDriverMenu() {
             let menu = document.getElementById("driverMenu");
             menu.innerHTML = "";
 
-            Object.keys(data).forEach((taxiId) => {
-                let button = document.createElement("button");
+            Object.entries(data).forEach(([taxiId, location]) => {
+                const div = document.createElement("div");
+                div.className = "driver-item";
+
+                const button = document.createElement("button");
                 button.innerText = `Taxi ${taxiId}`;
                 button.onclick = () => showRoute(taxiId);
-                menu.appendChild(button);
+
+                const timestampSpan = document.createElement("span");
+                timestampSpan.className = "timestamp";
+                timestampSpan.innerText = `Última actualización: ${formatTimestamp(location.timestamp)}`;
+
+                div.appendChild(button);
+                div.appendChild(timestampSpan);
+                menu.appendChild(div);
             });
 
             menu.style.display = "block";
