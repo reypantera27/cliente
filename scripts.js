@@ -5,6 +5,7 @@ let markers = {};
 let isAdmin = false;
 let routePaths = {};
 let trackingInterval = null;
+let requestCheckInterval = null;
 
 function askUserId() {
     const input = prompt("Ingrese su nombre (o 'admin' si es administrador):");
@@ -19,6 +20,8 @@ function askUserId() {
 
     if (!isAdmin) {
         startTracking();
+        addUpdateButton();
+        startRequestCheck(); // Chofer verifica solicitudes
     }
 
     loadGoogleMaps();
@@ -56,8 +59,15 @@ function getUserLocation(callback) {
             (error) => {
                 console.error("Error al obtener la ubicación:", error);
                 document.getElementById("status").textContent = "Error al obtener tu ubicación.";
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 10000
             }
         );
+    } else {
+        document.getElementById("status").textContent = "Geolocalización no soportada.";
     }
 }
 
@@ -72,7 +82,11 @@ function sendLocation() {
             lat: userPosition.lat,
             lng: userPosition.lng,
         }),
-    }).catch((error) => {
+    })
+    .then(() => {
+        loadTaxiLocations();
+    })
+    .catch((error) => {
         console.error("Error al enviar ubicación:", error);
         document.getElementById("status").textContent = "Error al enviar ubicación.";
     });
@@ -86,6 +100,36 @@ function startTracking() {
             getUserLocation(sendLocation);
         }, 10000);
     });
+}
+
+function addUpdateButton() {
+    const container = document.querySelector(".container");
+    const button = document.createElement("button");
+    button.id = "updateLocationButton";
+    button.innerText = "Actualizar Ubicación";
+    button.onclick = () => {
+        document.getElementById("status").textContent = "Solicitando ubicación...";
+        getUserLocation((position) => {
+            sendLocation();
+            document.getElementById("status").textContent = "Ubicación actualizada.";
+        });
+    };
+    container.appendChild(button);
+}
+
+// Nueva función: Chofer verifica solicitudes del admin
+function startRequestCheck() {
+    if (requestCheckInterval) clearInterval(requestCheckInterval);
+    requestCheckInterval = setInterval(() => {
+        fetch(`https://flota-cfj7.onrender.com/check-request?taxiId=${userId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.requested) {
+                    getUserLocation(sendLocation);
+                }
+            })
+            .catch((error) => console.error("Error al verificar solicitud:", error));
+    }, 10000);
 }
 
 function loadTaxiLocations() {
@@ -121,7 +165,6 @@ function loadTaxiLocations() {
     setTimeout(loadTaxiLocations, 10000);
 }
 
-// Función para formatear el timestamp a una hora legible
 function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
     const day = String(date.getDate()).padStart(2, "0");
@@ -143,15 +186,22 @@ function showDriverMenu() {
                 const div = document.createElement("div");
                 div.className = "driver-item";
 
-                const button = document.createElement("button");
-                button.innerText = `Taxi ${taxiId}`;
-                button.onclick = () => showRoute(taxiId);
+                const routeButton = document.createElement("button");
+                routeButton.innerText = `Taxi ${taxiId}`;
+                routeButton.onclick = () => showRoute(taxiId);
 
                 const timestampSpan = document.createElement("span");
                 timestampSpan.className = "timestamp";
                 timestampSpan.innerText = `Última actualización: ${formatTimestamp(location.timestamp)}`;
 
-                div.appendChild(button);
+                div.appendChild(routeButton);
+                if (isAdmin) {
+                    const updateButton = document.createElement("button");
+                    updateButton.className = "admin-update-button";
+                    updateButton.innerText = "Actualizar";
+                    updateButton.onclick = () => requestLocationUpdate(taxiId);
+                    div.appendChild(updateButton);
+                }
                 div.appendChild(timestampSpan);
                 menu.appendChild(div);
             });
@@ -159,6 +209,24 @@ function showDriverMenu() {
             menu.style.display = "block";
         })
         .catch((error) => console.error("Error al cargar menú de choferes:", error));
+}
+
+// Nueva función: Admin solicita actualización
+function requestLocationUpdate(taxiId) {
+    fetch("https://flota-cfj7.onrender.com/request-location", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taxiId }),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        document.getElementById("status").textContent = data.message;
+        setTimeout(loadTaxiLocations, 2000); // Refrescar mapa después de 2 segundos
+    })
+    .catch((error) => {
+        console.error("Error al solicitar actualización:", error);
+        document.getElementById("status").textContent = "Error al solicitar actualización.";
+    });
 }
 
 function showRoute(taxiId) {

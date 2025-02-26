@@ -74,6 +74,10 @@ h1 {
 
 .driver-item {
     margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
 }
 
 .driver-menu button {
@@ -84,12 +88,21 @@ h1 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    width: 100%;
     text-align: left;
 }
 
 .driver-menu button:hover {
     background-color: #2980b9;
+}
+
+.admin-update-button {
+    background-color: #e67e22;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.admin-update-button:hover {
+    background-color: #d35400;
 }
 
 .timestamp {
@@ -99,9 +112,33 @@ h1 {
     margin-top: 5px;
 }
 
+/* Botón de actualización del chofer */
+#updateLocationButton {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: #27ae60;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#updateLocationButton:hover {
+    background-color: #219653;
+}
+
 /* Diseño responsivo */
 @media (max-width: 768px) {
     #map {
         height: 75vh;
+    }
+    #updateLocationButton {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 16px;
+        font-size: 14px;
     }
 }
