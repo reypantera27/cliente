@@ -7,20 +7,20 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="header">
+    <header class="header">
         <h1>
-            <img src="icon-192.png" alt="Logo Izquierda" class="logo"> <!-- Logo a la izquierda -->
+            <img src="icon-192.png" alt="Logo Izquierda" class="logo">
             Control de Flota
-            <img src="icon-192.png" alt="Logo Derecha" class="logo"> <!-- Logo a la derecha -->
+            <img src="icon-192.png" alt="Logo Derecha" class="logo">
         </h1>
-    </div>
+    </header>
     <div class="container">
-        <div id="map"></div>
-        <p id="status"></p>
+        <div id="map" role="region" aria-label="Mapa de control de flota"></div>
+        <p id="status" role="status"></p>
     </div>
-    <div id="driverMenu" style="display:none; position: absolute; top: 20px; left: 20px; background-color: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 5px;">
+    <nav id="driverMenu" class="driver-menu" aria-hidden="true">
         <!-- Los botones de los choferes se agregarán aquí -->
-    </div>
+    </nav>
     
     <script src="scripts.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4BxT1FZ5gJttFfwKUP3EHGY94ciuPuik&callback=initMap"></script>

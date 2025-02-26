@@ -1,3 +1,6 @@
+/* Importar Poppins desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 /* Estilos generales */
 body {
     font-family: 'Poppins', sans-serif;
@@ -17,20 +20,19 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilos para el h1 con los logos */
 h1 {
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 2rem;
     font-weight: bold;
+    margin: 0;
 }
 
-/* Alineación de los logos a la izquierda y derecha */
 .logo {
-    width: 80px;  /* Ajusta el tamaño del logo */
+    width: 80px;
     height: auto;
-    margin: 0 10px; /* Espaciado entre el texto y los logos */
+    margin: 0 10px;
 }
 
 /* Contenedor principal */
@@ -39,7 +41,6 @@ h1 {
     margin: 20px;
 }
 
-/* Estilos del mapa */
 #map {
     width: 100%;
     height: 85vh;
@@ -47,7 +48,6 @@ h1 {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilos para la información flotante */
 #status {
     position: absolute;
     top: 20px;
@@ -61,24 +61,32 @@ h1 {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Estilos para los marcadores de los taxis */
-.marker-label {
-    background: rgba(255, 255, 255, 0.9);
-    color: #2c3e50;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 6px;
+/* Menú de choferes */
+.driver-menu {
+    display: none;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Ícono de taxi personalizado */
-.taxi-icon {
-    width: 40px;
-    height: 40px;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/6/66/Taxi_icon.png');
-    background-size: cover;
-    background-position: center;
+.driver-menu button {
+    background-color: #3498db;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+
+.driver-menu button:hover {
+    background-color: #2980b9;
 }
 
 /* Diseño responsivo */
@@ -86,19 +94,4 @@ h1 {
     #map {
         height: 75vh;
     }
-    #driverMenu button {
-        background-color: #3498db;
-        color: white;
-        font-size: 16px;
-        padding: 10px 20px;
-        border: none;
-        margin: 5px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    
-    #driverMenu button:hover {
-        background-color: #2980b9;
-    }
-    
 }
