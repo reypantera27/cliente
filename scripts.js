@@ -33,19 +33,20 @@ function initMap() {
     loadTaxiLocations();
 }
 
-// Obtener ubicación del usuario
-function getUserLocation(callback) {
+// Usar watchPosition para obtener la ubicación en tiempo real
+function startTracking() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
+        navigator.geolocation.watchPosition(position => {
             userPosition = position.coords;
-            callback(userPosition);
+            sendLocation();
         }, error => {
-            console.error("Error al obtener la ubicación:", error);
-            document.getElementById("status").textContent = "No se pudo obtener la ubicación.";
+            console.error("Error en geolocalización:", error);
+        }, {
+            enableHighAccuracy: true,
+            maximumAge: 5000
         });
     } else {
         console.error("Geolocalización no soportada.");
-        document.getElementById("status").textContent = "El navegador no soporta geolocalización.";
     }
 }
 
@@ -67,69 +68,48 @@ function sendLocation() {
         } else {
             console.error("Error al enviar ubicación.");
         }
-    });
+    }).catch(error => console.error("Error en fetch:", error));
 }
 
-// Actualizar ubicación cada 10 segundos
-function startTracking() {
-    getUserLocation(position => {
-        sendLocation();
-        setInterval(() => {
-            getUserLocation(sendLocation);
-        }, 10000);
-    });
-}
-
-// Cargar ubicaciones de los taxis
+// Cargar ubicaciones de los taxis y actualizar el mapa en tiempo real
 function loadTaxiLocations() {
     fetch('https://flota-cfj7.onrender.com/get-taxi-locations')
         .then(response => response.json())
         .then(data => {
-            // Eliminar marcadores antiguos
-            Object.values(markers).forEach(marker => marker.setMap(null));
-            markers = {};
-
             const ahora = Date.now();
 
             data.forEach(taxi => {
                 if (!isAdmin && taxi.id !== userId) return;
 
-                // Calcular tiempo transcurrido desde la última actualización
-                const tiempoTranscurrido = (ahora - new Date(taxi.lastUpdated).getTime()) / 1000 / 60; // en minutos
+                const tiempoTranscurrido = (ahora - new Date(taxi.lastUpdated).getTime()) / 1000 / 60; // minutos
 
-                // Si han pasado más de 10 minutos, no dibujar el marcador
                 if (tiempoTranscurrido > 10) {
-                    console.log(`Taxi ${taxi.id} eliminado por inactividad.`);
+                    if (markers[taxi.id]) {
+                        markers[taxi.id].setMap(null);
+                        delete markers[taxi.id];
+                        console.log(`movil ${taxi.id} eliminado por inactividad.`);
+                    }
                     return;
                 }
 
-                const marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(taxi.lat, taxi.lng),
-                    map,
-                    title: `Taxi: ${taxi.id}`
-                });
+                if (markers[taxi.id]) {
+                    markers[taxi.id].setPosition(new google.maps.LatLng(taxi.lat, taxi.lng));
+                } else {
+                    markers[taxi.id] = new google.maps.Marker({
+                        position: new google.maps.LatLng(taxi.lat, taxi.lng),
+                        map,
+                        title: `movil: ${taxi.id}`
+                    });
+                }
 
-                const lastUpdatedLabel = new Date(taxi.lastUpdated);
-                const formattedTime = lastUpdatedLabel.toLocaleString('es-AR', {
-                    timeZone: 'America/Argentina/Buenos_Aires',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    second: 'numeric',
-                });
-
-                marker.setLabel({
-                    text: `Última actualización: ${formattedTime}`,
+                markers[taxi.id].setLabel({
+                    text: `Última actualización: ${new Date(taxi.lastUpdated).toLocaleTimeString()}`,
                     fontSize: "10px",
-                    color: "#000000",
-                    className: 'marker-label'
+                    color: "#000000"
                 });
-
-                markers[taxi.id] = marker;
             });
         })
-        .catch(error => {
-            console.error("Error al cargar ubicaciones:", error);
-        });
+        .catch(error => console.error("Error al cargar ubicaciones:", error));
 
     setTimeout(loadTaxiLocations, 10000);
 }
