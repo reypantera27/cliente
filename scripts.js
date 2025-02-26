@@ -25,6 +25,11 @@ function askUserId() {
 
 // Inicializar el mapa
 function initMap() {
+    if (typeof google === 'undefined') {
+        console.error("Google Maps no se ha cargado correctamente.");
+        return;
+    }
+
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: -31.6300, lng: -60.7000 },
         zoom: 12
@@ -32,6 +37,7 @@ function initMap() {
 
     loadTaxiLocations();
 }
+
 
 // Usar watchPosition para obtener la ubicación en tiempo real
 function startTracking() {
