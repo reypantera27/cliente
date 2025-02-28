@@ -6,6 +6,9 @@ let isAdmin = false;
 let routePaths = {};
 let trackingInterval = null;
 let requestCheckInterval = null;
+let markerTimeouts = {}; // Nuevo objeto para almacenar temporizadores por taxiId
+
+const MAP_TIMEOUT = 3 * 60 * 1000; // 3 minutos en milisegundos
 
 function askUserId() {
     const input = prompt("Ingrese su nombre (o 'admin' si es administrador):");
@@ -21,7 +24,7 @@ function askUserId() {
     if (!isAdmin) {
         startTracking();
         addUpdateButton();
-        startRequestCheck(); // Chofer verifica solicitudes
+        startRequestCheck();
     }
 
     loadGoogleMaps();
@@ -117,7 +120,6 @@ function addUpdateButton() {
     container.appendChild(button);
 }
 
-// Nueva función: Chofer verifica solicitudes del admin
 function startRequestCheck() {
     if (requestCheckInterval) clearInterval(requestCheckInterval);
     requestCheckInterval = setInterval(() => {
@@ -140,19 +142,55 @@ function loadTaxiLocations() {
             document.getElementById("status").textContent = "";
             if (!data || Object.keys(data).length === 0) return;
 
-            Object.values(markers).forEach((marker) => marker.setMap(null));
-            markers = {};
+            // Limpiar marcadores antiguos (solo si no están en los nuevos datos)
+            Object.keys(markers).forEach((taxiId) => {
+                if (!data[taxiId]) {
+                    markers[taxiId].setMap(null);
+                    delete markers[taxiId];
+                    clearTimeout(markerTimeouts[taxiId]); // Limpiar temporizador
+                    delete markerTimeouts[taxiId];
+                }
+            });
 
             Object.entries(data).forEach(([taxiId, location]) => {
                 if (!isAdmin && taxiId !== userId) return;
 
-                const marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(location.lat, location.lng),
-                    map,
-                    title: `Taxi: ${taxiId}`,
-                });
+                // Actualizar o crear marcador
+                if (markers[taxiId]) {
+                    markers[taxiId].setPosition(new google.maps.LatLng(location.lat, location.lng));
+                } else {
+                    markers[taxiId] = new google.maps.Marker({
+                        position: new google.maps.LatLng(location.lat, location.lng),
+                        map,
+                        title: `Taxi: ${taxiId}`,
+                    });
+                }
 
-                markers[taxiId] = marker;
+                // Limpiar temporizador anterior si existe
+                if (markerTimeouts[taxiId]) {
+                    clearTimeout(markerTimeouts[taxiId]);
+                }
+
+                // Calcular tiempo transcurrido desde la última actualización
+                const lastUpdate = new Date(location.timestamp).getTime();
+                const now = Date.now();
+                const timeElapsed = now - lastUpdate;
+
+                // Si han pasado más de 3 minutos, no mostramos el marcador
+                if (timeElapsed >= MAP_TIMEOUT) {
+                    markers[taxiId].setMap(null);
+                    delete markers[taxiId];
+                } else {
+                    // Programar borrado del marcador después de 3 minutos desde la última actualización
+                    const timeRemaining = MAP_TIMEOUT - timeElapsed;
+                    markerTimeouts[taxiId] = setTimeout(() => {
+                        if (markers[taxiId]) {
+                            markers[taxiId].setMap(null);
+                            delete markers[taxiId];
+                            console.log(`Marcador de ${taxiId} borrado por inactividad`);
+                        }
+                    }, timeRemaining);
+                }
             });
 
             showDriverMenu();
@@ -211,7 +249,6 @@ function showDriverMenu() {
         .catch((error) => console.error("Error al cargar menú de choferes:", error));
 }
 
-// Nueva función: Admin solicita actualización
 function requestLocationUpdate(taxiId) {
     fetch("https://flota-cfj7.onrender.com/request-location", {
         method: "POST",
@@ -221,7 +258,7 @@ function requestLocationUpdate(taxiId) {
     .then((response) => response.json())
     .then((data) => {
         document.getElementById("status").textContent = data.message;
-        setTimeout(loadTaxiLocations, 2000); // Refrescar mapa después de 2 segundos
+        setTimeout(loadTaxiLocations, 2000);
     })
     .catch((error) => {
         console.error("Error al solicitar actualización:", error);
